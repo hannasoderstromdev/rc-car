@@ -19,17 +19,36 @@ describe('MonsterTruck', () => {
   })
 
   describe('setPosition', () => {
-    it('sets position', () => {
-      monsterTruck.setPosition(1, 2)
-      expect(monsterTruck.position.x).toEqual(1)
-      expect(monsterTruck.position.y).toEqual(2)
+    it('sets position if inside of bounds', () => {
+      monsterTruck.setDimensions({ width: 2, height: 2 })
+      monsterTruck.setPosition(0, 1)
+      expect(monsterTruck.position.x).toEqual(0)
+      expect(monsterTruck.position.y).toEqual(1)
+    })
+
+    it('does not set position if outside of bounds', () => {
+      monsterTruck.setDimensions({ width: 2, height: 2 })
+      try {
+        monsterTruck.setPosition(3, 2)
+      } catch (error) {
+        expect(error).toEqual(Error('Position out of bounds'))
+      }
+      expect(monsterTruck.position.x).toEqual(0)
+      expect(monsterTruck.position.y).toEqual(0)
+    })
+  })
+
+  describe('setCrashed', () => {
+    it('sets hasCrashed to true', () => {
+      monsterTruck.setCrashed()
+      expect(monsterTruck.hasCrashed).toEqual(true)
     })
   })
 
   describe('isPositionOutOfBounds', () => {
     it('handles valid coordinations', () => {
       monsterTruck.setDimensions({ width: 2, height: 2 })
-      expect(monsterTruck.isPositionOutOfBounds(1, 2)).toEqual(false)
+      expect(monsterTruck.isPositionOutOfBounds(1, 1)).toEqual(false)
     })
 
     it('handles invalid coordinations', () => {
@@ -47,6 +66,15 @@ describe('MonsterTruck', () => {
   })
 
   describe('goForward', () => {
+    it('sets hasCrashed if out of bounds', () => {
+      monsterTruck.setDimensions({ width: 4, height: 4 })
+      monsterTruck.setPosition(3, 3)
+      monsterTruck.setHeading('n')
+      monsterTruck.goForward()
+      expect(monsterTruck.hasCrashed).toEqual(true)
+    })
+
+
     it('moves vehicle north if headed north', () => {
       monsterTruck.setDimensions({ width: 4, height: 4 })
       monsterTruck.setPosition(0, 0)
@@ -69,7 +97,6 @@ describe('MonsterTruck', () => {
     })
 
     it('moves vehicle south if headed south', () => {
-
       monsterTruck.setDimensions({ width: 4, height: 4 })
       monsterTruck.setPosition(0, 1)
       monsterTruck.setHeading('s')
