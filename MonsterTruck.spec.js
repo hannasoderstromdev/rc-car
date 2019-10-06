@@ -31,7 +31,7 @@ describe('MonsterTruck', () => {
       try {
         monsterTruck.setPosition(3, 2)
       } catch (error) {
-        expect(error).toEqual(Error('Position out of bounds'))
+        expect(error).toEqual(Error('Position out of bounds, please try again?'))
       }
       expect(monsterTruck.position.x).toEqual(0)
       expect(monsterTruck.position.y).toEqual(0)
@@ -59,9 +59,22 @@ describe('MonsterTruck', () => {
   })
 
   describe('setHeading', () => {
-    it('sets heading', () => {
+    it('handles valid heading', () => {
       monsterTruck.setHeading('s')
       expect(monsterTruck.heading).toEqual('s')
+    })
+    
+    it('handles invalid heading', () => {
+      try {
+        monsterTruck.setHeading('a')
+      } catch (error) {
+        expect(error).toEqual(
+          Error(
+            'Invalid heading, must be North(N), East(E), South(S) or West(W)',
+          ),
+        )
+      }
+      expect(monsterTruck.heading).toEqual('n')
     })
   })
 
