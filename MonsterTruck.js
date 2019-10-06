@@ -17,8 +17,11 @@ class MonsterTruck {
   }
 
   setPosition(x, y) {
-    this.position.x = x
-    this.position.y = y
+    if (!this.isPositionOutOfBounds(x, y)) {
+      this.position = { x, y }
+    } else {
+      throw Error('Position out of bounds')
+    }
   }
 
   setHeading(heading) {
@@ -32,7 +35,7 @@ class MonsterTruck {
   isPositionOutOfBounds(x, y) {
     const { width, height } = this.roomDimensions
 
-    return x < 0 || x > width || y < 0 || y > height
+    return x < 0 || x >= width || y < 0 || y >= height
   }
 
   turnRight() {
