@@ -36,18 +36,19 @@ class App {
       return this.errorHandler.setError('Coordinates must be numbers')
     }
 
-    if (this.monsterTruck.isPositionOutOfBounds(x, y)) {
-      return this.errorHandler.setError('Starting position is out of bounds')
-    }
-
     const heading = parsedText[2].toLowerCase()
 
-    if (heading !== 'n' && heading !== 'e' && heading !== 's' && heading !== 'w') {
-      return this.errorHandler.setError('Invalid heading, must be North(N), East(E), South(S) or West(W)')
+    try {
+      this.monsterTruck.setHeading(heading)
+    } catch (error) {
+      return this.errorHandler.setError(error.message + '\n')
     }
 
-    this.monsterTruck.setPosition(x, y)
-    this.monsterTruck.setHeading(heading)
+    try {
+      this.monsterTruck.setPosition(x, y)
+    } catch (error) {
+      return this.errorHandler.setError(error.message + '\n')
+    }
   }
 
   parseForMovement(text) {
@@ -56,10 +57,14 @@ class App {
       return this.errorHandler.setError('Invalid movement, must be Forward(F), Backward(B), Turn Right(R) or Turn Left(L)')
     }
 
-    if (lowerCased === 'f') this.monsterTruck.goForward()
-    if (lowerCased === 'b') this.monsterTruck.goBackward()
-    if (lowerCased === 'r') this.monsterTruck.turnRight()
-    if (lowerCased === 'l') this.monsterTruck.turnLeft()
+    try {
+      if (lowerCased === 'f') this.monsterTruck.goForward()
+      if (lowerCased === 'b') this.monsterTruck.goBackward()
+      if (lowerCased === 'r') this.monsterTruck.turnRight()
+      if (lowerCased === 'l') this.monsterTruck.turnLeft()
+    } catch (error) {
+      this.errorHandler.setError(error.message + '\n')
+    }
   }
 
   quit() {
