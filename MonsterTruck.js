@@ -20,11 +20,21 @@ class MonsterTruck {
     if (!this.isPositionOutOfBounds(x, y)) {
       this.position = { x, y }
     } else {
-      throw Error('Position out of bounds')
+      throw Error('Position out of bounds, please try again?')
     }
   }
 
   setHeading(heading) {
+    if (
+      heading !== 'n' &&
+      heading !== 'e' &&
+      heading !== 's' &&
+      heading !== 'w'
+    ) {
+      throw Error(
+        'Invalid heading, must be North(N), East(E), South(S) or West(W)'
+      )
+    }
     this.heading = heading
   }
 
