@@ -103,7 +103,7 @@ class App {
 
     // Drive until crash
     while(!hasCrashed) {
-      await query(questions[2].text)
+      await query(questions[2].text, questions[2].callback)
     }
 
     console.log(`You have crashed into the wall! Position x:${x}, y:${y}, heading: ${heading}.`)
