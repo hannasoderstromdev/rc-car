@@ -1,7 +1,10 @@
 # Monster Truck Simulator
 
-## Assumptions
+This is a simple command line interface text based game where the user defines the size of a room, the starting position and then "drives" by giving commands for movements.
 
-The instructions didn't specify the number of moves that constitutes for a successful simulation, so I assumed the 9 steps in the example would constitute such.
+- F - forward
+- B - backward
+- R - turn right
+- L - turn left
 
-Hence, if the user has navigated 9 times and still haven't hit a wall, the simulation will end successfully.
+You can continue the game until you hit a wall.
