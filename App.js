@@ -56,12 +56,10 @@ class App {
       return this.errorHandler.setError('Invalid movement, must be Forward(F), Backward(B), Turn Right(R) or Turn Left(L)')
     }
 
-    const { monsterTruck } = this
-
-    if (lowerCased === 'f') monsterTruck.goForward()
-    if (lowerCased === 'b') monsterTruck.goBackward()
-    if (lowerCased === 'r') monsterTruck.turnRight()
-    if (lowerCased === 'l') monsterTruck.turnLeft()
+    if (lowerCased === 'f') this.monsterTruck.goForward()
+    if (lowerCased === 'b') this.monsterTruck.goBackward()
+    if (lowerCased === 'r') this.monsterTruck.turnRight()
+    if (lowerCased === 'l') this.monsterTruck.turnLeft()
   }
 
   quit() {
@@ -99,10 +97,13 @@ class App {
       await query(question.text, question.callback)
     }
 
-    const {  hasCrashed, heading, position: { x, y } } = this.monsterTruck
+    const {
+      heading,
+      position: { x, y },
+    } = this.monsterTruck
 
     // Drive until crash
-    while(!hasCrashed) {
+    while (!this.monsterTruck.hasCrashed) {
       await query(questions[2].text, questions[2].callback)
     }
 
