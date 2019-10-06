@@ -4,12 +4,10 @@
   "description": "## Assumptions",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@testing-library/jest-dom": "^4.1.0"
-  }
+  "license": "ISC"
 }
