@@ -102,17 +102,14 @@ class App {
       await query(question.text, question.callback)
     }
 
-    const {
-      heading,
-      position: { x, y },
-    } = this.monsterTruck
-
     // Drive until crash
     while (!this.monsterTruck.hasCrashed) {
       await query(questions[2].text, questions[2].callback)
     }
 
-    console.log(`You have crashed into the wall! Position before crash was x:${x}, y:${y}, heading: ${heading}.`)
+    console.log(
+      `You have crashed into the wall! Position before crash was x:${this.monsterTruck.position.x}, y:${this.monsterTruck.position.y}, heading: ${this.monsterTruck.heading}.`,
+    )
     this.quit()
   }
 }
