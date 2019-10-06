@@ -15,7 +15,6 @@ jest.mock('./MonsterTruck', () => {
       setDimensions: mockSetDimensions,
       setPosition: mockSetPosition,
       setHeading: mockSetHeading,
-      isPositionOutOfBounds: mockIsPositionOutOfBounds,
       goForward: mockGoForward,
       goBackward: mockGoBackward,
       turnRight: mockTurnRight,
@@ -74,24 +73,6 @@ describe('App', () => {
       expect(app.errorHandler.error).toEqual(true)
       expect(app.errorHandler.message).toEqual(
         'Coordinates must be numbers',
-      )
-    })
-
-    xit('handles coordinates being out of bounds', () => {
-      app.parseForDimensions('1 1')
-      app.parseForStartingPosition('-1 -1 n')
-      expect(app.errorHandler.error).toEqual(true)
-      expect(app.errorHandler.message).toEqual(
-        'Starting position is out of bounds',
-      )
-    })
-
-    it('handles invalid heading', () => {
-      app.parseForDimensions('1 1')
-      app.parseForStartingPosition('0 0 a')
-      expect(app.errorHandler.error).toEqual(true)
-      expect(app.errorHandler.message).toEqual(
-        'Invalid heading, must be North(N), East(E), South(S) or West(W)',
       )
     })
   })
