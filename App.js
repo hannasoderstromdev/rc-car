@@ -112,7 +112,7 @@ class App {
       await query(questions[2].text, questions[2].callback)
     }
 
-    console.log(`You have crashed into the wall! Position x:${x}, y:${y}, heading: ${heading}.`)
+    console.log(`You have crashed into the wall! Position before crash was x:${x}, y:${y}, heading: ${heading}.`)
     this.quit()
   }
 }
