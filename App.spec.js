@@ -1,5 +1,29 @@
 const App = require('./App')
 
+const mockSetDimensions = jest.fn()
+const mockIsPositionOutOfBounds = jest.fn()
+const mockSetPosition = jest.fn()
+const mockSetHeading = jest.fn()
+const mockGoForward = jest.fn()
+const mockGoBackward = jest.fn()
+const mockTurnRight = jest.fn()
+const mockTurnLeft = jest.fn()
+
+jest.mock('./MonsterTruck', () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+      setDimensions: mockSetDimensions,
+      setPosition: mockSetPosition,
+      setHeading: mockSetHeading,
+      isPositionOutOfBounds: mockIsPositionOutOfBounds,
+      goForward: mockGoForward,
+      goBackward: mockGoBackward,
+      turnRight: mockTurnRight,
+      turnLeft: mockTurnLeft,
+    }
+  })
+})
+
 describe('App', () => {
   let app
 
@@ -11,30 +35,10 @@ describe('App', () => {
     app = null
   })
 
-  describe('setDimensions', () => {
-    it('sets dimensions', () => {
-      app.setDimensions({ width: 1, height: 2}) 
-      expect(app.dimensions).toEqual({ width: 1, height: 2 })
-    })
-  })
-
-  describe('isPositionInvalid', () => {
-    it('handles valid coordinations', () => {
-      app.setDimensions({ width: 2, height: 2 })
-      expect(app.isPositionInvalid(1, 2)).toEqual(false)
-    })
-
-    it('handles invalid coordinations', () => {
-      app.setDimensions({ width: 2, height: 2 })
-      expect(app.isPositionInvalid(-1, 2)).toEqual(true)
-      expect(app.isPositionInvalid(1, 3)).toEqual(true)
-    })
-  })
-
   describe('parseForDimensions', () => {
     it('handles valid input', () => {
       app.parseForDimensions('1 1')
-      expect(app.dimensions).toEqual({ width: 1, height: 1 })
+      expect(mockSetDimensions).toHaveBeenCalledWith({ width: 1, height: 1 })
     })
 
     it('handles missing input', () => {
@@ -50,16 +54,11 @@ describe('App', () => {
     })
   })
 
-  it('setHeading sets heading', () => {
-    app.setHeading('s')
-    expect(app.heading).toEqual('s')
-  })
-
   describe('parseForStartingPosition', () => {
     it('handles valid input', () => {
       app.parseForStartingPosition('0 0 E')
-      expect(app.position).toEqual({ x: 0, y: 0 })
-      expect(app.heading).toEqual('e')
+      expect(mockSetPosition).toHaveBeenCalledWith(0, 0)
+      expect(mockSetHeading).toHaveBeenCalledWith('e')
     })
 
     it('handles missing input', () => {
@@ -78,7 +77,7 @@ describe('App', () => {
       )
     })
 
-    it('handles coordinates being out of bounds', () => {
+    xit('handles coordinates being out of bounds', () => {
       app.parseForDimensions('1 1')
       app.parseForStartingPosition('-1 -1 n')
       expect(app.errorHandler.error).toEqual(true)
@@ -97,171 +96,34 @@ describe('App', () => {
     })
   })
 
-  describe('goForward', () => {
-    it('moves vehicle north if headed north', () => {
-      app.parseForDimensions('4 4')
-      app.parseForStartingPosition('0 0 n')
-      app.goForward()
-      expect(app.position.x).toEqual(0)
-      expect(app.position.y).toEqual(1)
-      expect(app.heading).toEqual('n')
-    })
-    
-    it('moves vehicle east if headed east', () => {
-      app.parseForDimensions('4 4')
-      app.parseForStartingPosition('0 0 e')
-      app.goForward()
-      expect(app.position.x).toEqual(1)
-      expect(app.position.y).toEqual(0)
-      expect(app.heading).toEqual('e')
-    })
-    
-    it('moves vehicle south if headed south', () => {
-      app.parseForDimensions('4 4')
-      app.parseForStartingPosition('0 1 s')
-      app.goForward()
-      expect(app.position.x).toEqual(0)
-      expect(app.position.y).toEqual(0)
-      expect(app.heading).toEqual('s')
-    })
-    
-    it('moves vehicle west if headed west', () => {
-      app.parseForDimensions('4 4')
-      app.parseForStartingPosition('1 0 w')
-      app.goForward()
-      expect(app.position.x).toEqual(0)
-      expect(app.position.y).toEqual(0)
-      expect(app.heading).toEqual('w')
-    })
-  })
-
-  describe('goBackward', () => {
-    it('moves vehicle south if headed north', () => {
-      app.parseForDimensions('4 4')
-      app.parseForStartingPosition('0 1 n')
-      app.goBackward()
-      expect(app.position.x).toEqual(0)
-      expect(app.position.y).toEqual(0)
-      expect(app.heading).toEqual('n')
-    })
-    
-    it('moves vehicle west if headed east', () => {
-      app.parseForDimensions('4 4')
-      app.parseForStartingPosition('1 0 e')
-      app.goBackward()
-      expect(app.position.x).toEqual(0)
-      expect(app.position.y).toEqual(0)
-      expect(app.heading).toEqual('e')
-    })
-    
-    it('moves vehicle north if headed south', () => {
-      app.parseForDimensions('4 4')
-      app.parseForStartingPosition('0 0 s')
-      app.goBackward()
-      expect(app.position.x).toEqual(0)
-      expect(app.position.y).toEqual(1)
-      expect(app.heading).toEqual('s')
-    })
-    
-    it('moves vehicle east if headed west', () => {
-      app.parseForDimensions('4 4')
-      app.parseForStartingPosition('0 0 w')
-      app.goBackward()
-      expect(app.position.x).toEqual(1)
-      expect(app.position.y).toEqual(0)
-      expect(app.heading).toEqual('w')
-    })
-  })
-
-  describe('turnRight', () => {
-    it('turns east if headed north', () => {
-      app.parseForDimensions('4 4')
-      app.parseForStartingPosition('0 0 n')
-      app.turnRight()
-      expect(app.heading).toEqual('e')
-    })
-    it('turns south if headed east', () => {
-      app.parseForDimensions('4 4')
-      app.parseForStartingPosition('0 0 e')
-      app.turnRight()
-      expect(app.heading).toEqual('s')
-    })
-    it('turns west if headed south', () => {
-      app.parseForDimensions('4 4')
-      app.parseForStartingPosition('0 0 s')
-      app.turnRight()
-      expect(app.heading).toEqual('w')
-    })
-    it('turns north if headed west', () => {
-      app.parseForDimensions('4 4')
-      app.parseForStartingPosition('0 0 w')
-      app.turnRight()
-      expect(app.heading).toEqual('n')
-    })
-  })
-
-  describe('turnLeft', () => {
-    it('turns west if headed north', () => {
-      app.parseForDimensions('4 4')
-      app.parseForStartingPosition('0 0 n')
-      app.turnLeft()
-      expect(app.heading).toEqual('w')
-    })
-    it('turns south if headed west', () => {
-      app.parseForDimensions('4 4')
-      app.parseForStartingPosition('0 0 w')
-      app.turnLeft()
-      expect(app.heading).toEqual('s')
-    })
-    it('turns east if headed south', () => {
-      app.parseForDimensions('4 4')
-      app.parseForStartingPosition('0 0 s')
-      app.turnLeft()
-      expect(app.heading).toEqual('e')
-    })
-    it('turns north if headed east', () => {
-      app.parseForDimensions('4 4')
-      app.parseForStartingPosition('0 0 e')
-      app.turnLeft()
-      expect(app.heading).toEqual('n')
-    })
-  })
-
   describe('parseForMovement', () => {
     it('handles valid input "f"', () => {
       app.parseForDimensions('4 4')
       app.parseForStartingPosition('0 0 e')
       app.parseForMovement('f')
-      expect(app.heading).toEqual('e')
-      expect(app.position.x).toEqual(1)
-      expect(app.position.y).toEqual(0)
+      expect(mockGoForward).toHaveBeenCalledTimes(1)
     })
 
     it('handles valid input "b"', () => {
       app.parseForDimensions('4 4')
       app.parseForStartingPosition('0 1 n')
       app.parseForMovement('b')
-      expect(app.heading).toEqual('n')
-      expect(app.position.x).toEqual(0)
-      expect(app.position.y).toEqual(0)
+      expect(mockGoBackward).toHaveBeenCalledTimes(1)
+
     })
 
     it('handles valid input "r"', () => {
       app.parseForDimensions('4 4')
       app.parseForStartingPosition('0 1 n')
       app.parseForMovement('r')
-      expect(app.heading).toEqual('e')
-      expect(app.position.x).toEqual(0)
-      expect(app.position.y).toEqual(1)
+      expect(mockTurnRight).toHaveBeenCalledTimes(1)
     })
 
     it('handles valid input "l"', () => {
       app.parseForDimensions('4 4')
       app.parseForStartingPosition('0 1 n')
       app.parseForMovement('l')
-      expect(app.heading).toEqual('w')
-      expect(app.position.x).toEqual(0)
-      expect(app.position.y).toEqual(1)
+      expect(mockTurnLeft).toHaveBeenCalledTimes(1)
     })
 
     it('handles invalid input', () => {

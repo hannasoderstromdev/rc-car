@@ -1,49 +1,22 @@
 const ErrorHandler = require('./ErrorHandler')
+const MonsterTruck = require('./MonsterTruck')
 const query = require('./query')
 
 class App {
   constructor() {
     this.parseForDimensions = this.parseForDimensions.bind(this)
-    this.setDimensions = this.setDimensions.bind(this)
-    this.setHeading = this.setHeading.bind(this)
     this.parseForStartingPosition = this.parseForStartingPosition.bind(this)
     this.parseForMovement = this.parseForMovement.bind(this)
 
-    this.dimensions = {
-      width: 0,
-      height: 0,
-    }
     this.errorHandler = new ErrorHandler()
-    this.position = {
-      x: 0,
-      y: 0,
-    }
-    this.heading = 'n'
-    this.hasCrashed = false
-  }
-
-  setDimensions({ width, height }) {
-    this.dimensions = { width, height }
-  }
-
-  setHeading(heading) {
-    this.heading = heading
-  }
-
-  setPosition(x, y) {
-    this.position.x = x
-    this.position.y = y
-  }
-
-  setCrashed() {
-    this.hasCrashed = true
+    this.monsterTruck = new MonsterTruck()
   }
 
   parseForDimensions(text) {
     const parsedText = text.split(' ').map(number => parseInt(number))
 
     if (parsedText.length === 2 && !parsedText.includes(NaN)) {
-      this.setDimensions({ width: parsedText[0], height: parsedText[1] })
+      this.monsterTruck.setDimensions({ width: parsedText[0], height: parsedText[1] })
     } else {
       this.errorHandler.setError('Invalid command')
     } 
@@ -63,19 +36,18 @@ class App {
       return this.errorHandler.setError('Coordinates must be numbers')
     }
 
-    if (this.isPositionInvalid(x, y)) {
+    if (this.monsterTruck.isPositionOutOfBounds(x, y)) {
       return this.errorHandler.setError('Starting position is out of bounds')
     }
 
-    this.setPosition(x, y)
-        
     const heading = parsedText[2].toLowerCase()
 
     if (heading !== 'n' && heading !== 'e' && heading !== 's' && heading !== 'w') {
       return this.errorHandler.setError('Invalid heading, must be North(N), East(E), South(S) or West(W)')
     }
 
-    this.setHeading(heading)
+    this.monsterTruck.setPosition(x, y)
+    this.monsterTruck.setHeading(heading)
   }
 
   parseForMovement(text) {
@@ -84,68 +56,12 @@ class App {
       return this.errorHandler.setError('Invalid movement, must be Forward(F), Backward(B), Turn Right(R) or Turn Left(L)')
     }
 
-    if (lowerCased === 'f') this.goForward()
-    if (lowerCased === 'b') this.goBackward()
-    if (lowerCased === 'r') this.turnRight()
-    if (lowerCased === 'l') this.turnLeft()
-  }
+    const { monsterTruck } = this
 
-  turnRight() {
-    const { heading, setHeading } = this
-    if (heading === 'n') setHeading('e')
-    if (heading === 'e') setHeading('s')
-    if (heading === 's') setHeading('w')
-    if (heading === 'w') setHeading('n')
-  }
-
-  turnLeft() {
-    const { heading, setHeading } = this
-    if (heading === 'n') setHeading('w')
-    if (heading === 'w') setHeading('s')
-    if (heading === 's') setHeading('e')
-    if (heading === 'e') setHeading('n')
-  }
-
-  goForward() {
-    const { heading } = this
-    const { x, y } = this.position
-    if (heading === 'n' && !this.isPositionInvalid(x, y + 1)) {
-      this.setPosition(x, y + 1)
-    }
-    else if (heading === 'e' && !this.isPositionInvalid(x + 1, y)) {
-      this.setPosition(x + 1, y)
-    }
-    else if (heading === 's' && !this.isPositionInvalid(x, y - 1)) {
-      this.setPosition(x, y - 1)
-    }
-    else if (heading === 'w' && !this.isPositionInvalid(x - 1, y)) {
-      this.setPosition(x - 1, y)
-    }
-    else {
-      this.setCrashed()
-    }
-  }
-
-  goBackward() {
-    const { heading } = this
-    const { x, y } = this.position
-    if (heading === 'n' && !this.isPositionInvalid(x, y - 1)) {
-      this.setPosition(x, y - 1)
-    } else if (heading === 'e' && !this.isPositionInvalid(x - 1, y)) {
-      this.setPosition(x - 1, y)
-    } else if (heading === 's' && !this.isPositionInvalid(x, y + 1)) {
-      this.setPosition(x, y + 1)
-    } else if (heading === 'w' && !this.isPositionInvalid(x + 1, y)) {
-      this.setPosition(x + 1, y)
-    } else {
-      this.setCrashed()
-    }
-  }
-
-  isPositionInvalid(x, y) {
-    const { width, height } = this.dimensions
-
-    return (x < 0 || x > width || y < 0 || y > height) 
+    if (lowerCased === 'f') monsterTruck.goForward()
+    if (lowerCased === 'b') monsterTruck.goBackward()
+    if (lowerCased === 'r') monsterTruck.turnRight()
+    if (lowerCased === 'l') monsterTruck.turnLeft()
   }
 
   quit() {
@@ -183,13 +99,14 @@ class App {
       await query(question.text, question.callback)
     }
 
+    const {  hasCrashed, heading, position: { x, y } } = this.monsterTruck
+
     // Drive until crash
-    while(!this.hasCrashed) {
+    while(!hasCrashed) {
       await query(questions[2].text)
     }
 
-    const { x, y } = this.position
-    console.log(`You have crashed into the wall! Position x:${x}, y:${y}, heading: ${this.heading}.`)
+    console.log(`You have crashed into the wall! Position x:${x}, y:${y}, heading: ${heading}.`)
     this.quit()
   }
 }
